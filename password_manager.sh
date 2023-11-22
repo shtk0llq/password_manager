@@ -1,15 +1,49 @@
 echo "パスワードマネージャーへようこそ！"
 
-echo "サービス名を入力してください："
-read service_name
+while [ "$input" != "Exit" ]
+do
+  echo "次の選択肢から入力してください(Add Password/Get Password/Exit)："
+  read input
 
-echo "ユーザー名を入力してください："
-read user_name
+  case "$input" in
+    "Add Password")
+      echo "サービス名を入力してください："
+      read service_name
 
-echo "パスワードを入力してください："
-read password
+      echo "ユーザー名を入力してください："
+      read user_name
 
-echo "$service_name:$user_name:$password" >> password_manager.sh
+      echo "パスワードを入力してください："
+      read password
+      
+      echo "$service_name:$user_name:$password" >> password_manager.sh
 
-echo "Thank you!"
+      echo "パスワードの追加は成功しました。"
+      ;;
+    "Get Password")
+      echo "サービス名を入力してください："
+      read service_name
+      grep -q "^$service_name:" password_manager.sh
+
+      if [ $? -eq 0 ]; then
+        service=$(grep "^$service_name:" password_manager.sh)
+        IFS=":"
+        read service_name user_name password <<< "$service"
+
+        echo "サービス名：$service_name"
+        echo "ユーザー名：$user_name"
+        echo "パスワード：$password"
+      else
+        echo "そのサービスは登録されていません"
+      fi
+      ;;
+    "Exit")
+      echo "Thank you!"
+      ;;
+    *)
+      echo "入力が間違えています。Add Password/Get Password/Exit から入力してください。"
+      ;;
+  esac
+done
+
 exit 0
